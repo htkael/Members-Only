@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title></title>
+  </head>
+  <body>
+    <h1>Register an account</h1>
+    <% if (locals.errors && errors.length > 0) { %>
+    <div class="error-container">
+      <% errors.forEach(error => { %>
+      <p class="error"><%= error.msg %></p>
+      <% }) %>
+    </div>
+    <% } %>
+    <form action="/register" method="POST">
+      <label for="full_name">Full name</label>
+      <input type="text" name="full_name" id="full_name" required />
+      <label for="username">Username</label>
+      <input id="username" name="username" type="text" required />
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" required />
+      <label for="password_conf">Confirm password</label>
+      <input id="password_conf" name="password_conf" type="password" required />
+      <button>Sign Up</button>
+    </form>
+  </body>
+</html>
