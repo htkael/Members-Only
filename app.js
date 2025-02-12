@@ -18,11 +18,11 @@ app.use(express.json());
 sessionConfig(app);
 passportConfig(app);
 
-app.use((req, res, next) => {
-  console.log(req.session);
-  console.log(req.user);
-  next();
-});
+// app.use((req, res, next) => {
+//   console.log(req.session);
+//   console.log(req.user);
+//   next();
+// });
 
 app.use("/", indexRouter);
 

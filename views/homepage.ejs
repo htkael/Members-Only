@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Homepage</title>
+    <link rel="stylesheet" href="/css/index.css" />
+    <link rel="stylesheet" href="/css/homepage.css" />
+  </head>
+  <body>
+    <div class="container" style="max-width: 800px">
+      <div class="header-section">
+        <h1>You made it to the homepage!</h1>
+        <div class="user-info">
+          <h2>Welcome, <%= user.full_name %></h2>
+        </div>
+
+        <div class="action-buttons">
+          <button onclick="checkPasscode()" class="member-button">
+            Become a Member!
+          </button>
+          <a href="/message" class="button">Create a new message</a>
+          <a href="/logout" class="button logout-btn">Logout</a>
+        </div>
+      </div>
+
+      <% if (locals.messages) { %>
+      <div class="messages-section">
+        <h2>Messages</h2>
+        <% messages.forEach(message => { if (user.membership_status === 'basic')
+        { message.username = '****'; message.full_name = '****'; } %>
+        <div class="message-card">
+          <div class="message-header">
+            <div class="message-title">
+              <h3><%= message.title %></h3>
+              <div class="author-info">
+                <p class="author-name">By: <%= message.full_name %></p>
+                <p class="author-username">@<%= message.username %></p>
+                <p class="timestamp">
+                  <%= typeof message.timestamp === 'string' ? message.timestamp
+                  : message.timestamp.toLocaleDateString('en-US', { year:
+                  'numeric', month: 'short', day: 'numeric', hour: '2-digit',
+                  minute: '2-digit' }) %>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="message-content">
+            <p><%= message.content %></p>
+          </div>
+          <% if (user.membership_status === 'admin') { %>
+          <form action="/delete/<%= message.id %>" method="POST">
+            <button type="submit" class="delete">Delete</button>
+          </form>
+          <% } %>
+        </div>
+        <% }); %>
+      </div>
+      <% } %>
+      <button onclick="checkAdmin()" class="member-button secret-button">
+        Secret Admin Button!
+      </button>
+    </div>
+    <script>
+      async function checkPasscode() {
+        const passcode = prompt(
+          "Enter the secret passcode... hint: she is a puppy"
+        );
+        if (passcode) {
+          try {
+            const response = await fetch("/verify-passcode", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ passcode: passcode }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+              alert("Welcome member");
+              window.location.reload();
+            } else {
+              alert("Incorrect passcode");
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            alert("Something went wrong. Please try again.");
+          }
+        }
+      }
+      async function checkAdmin() {
+        const passcode = prompt(
+          "Enter the secret admin passcode... hint: two animals"
+        );
+        if (passcode) {
+          try {
+            const response = await fetch("/verify-admin", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ passcode: passcode }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+              alert("Welcome agent");
+              window.location.reload();
+            } else {
+              alert("Incorrect passcode. Get out, spy.");
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            alert("Something went wrong. Please try again.");
+          }
+        }
+      }
+    </script>
+  </body>
+</html>

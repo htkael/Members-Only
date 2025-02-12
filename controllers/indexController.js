@@ -15,7 +15,7 @@ exports.getRegisterForm = async (req, res) => {
 
 exports.registerUser = [
   registerValidation,
-  async (req, res) => {
+  async (req, res, next) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -28,8 +28,22 @@ exports.registerUser = [
       const username = req.body.username;
       const membership_status = "basic";
       const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+      const { rows } = await db.addUser(
+        full_name,
+        username,
+        hashedPassword,
+        membership_status
+      );
+      const user = rows[0];
+
       await db.addUser(full_name, username, hashedPassword, membership_status);
-      res.redirect("/");
+      req.login(user, (err) => {
+        if (err) {
+          return next(err);
+        }
+        return res.redirect("/");
+      });
     } catch (error) {
       console.error("Could not add user", error);
       next(error);
@@ -47,5 +61,5 @@ exports.isAuthenticated = (req, res, next) => {
   if (req.isAuthenticated()) {
     return next();
   }
-  res.redirect("login");
+  res.redirect("/login");
 };
